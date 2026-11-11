@@ -1,0 +1,115 @@
+{{define "content"}}
+<div class="page-header no-print">
+  <h1 class="page-title">Laporan Buku Tabungan & Mutasi</h1>
+  <div class="actions">
+    <button type="button" onclick="window.print()" class="btn btn-primary">🖨 Cetak Laporan</button>
+    <a href="/admin/laporan" class="btn btn-outline">Kembali ke Laporan</a>
+  </div>
+</div>
+
+<div class="card mb-4 no-print" style="margin-bottom: 20px;">
+  <form method="get" action="/admin/laporan/mutasi" style="display: flex; gap: 12px; align-items: flex-end; flex-wrap: wrap;">
+    <div style="flex: 2; min-width: 200px;">
+      <label for="nasabah_id" style="display: block; font-size: 0.85rem; margin-bottom: 4px;">Pilih Nasabah (Opsional)</label>
+      <select id="nasabah_id" name="nasabah_id" style="width: 100%; padding: 8px; border-radius: var(--radius); border: 1px solid var(--gray-200);">
+        <option value="">-- Semua Nasabah --</option>
+        {{range .Data.NasabahList}}
+        <option value="{{.ID}}" {{if eq .ID $.Data.SelectedNasabahID}}selected{{end}}>
+          {{.KodeNasabah}} - {{.Nama}}
+        </option>
+        {{end}}
+      </select>
+    </div>
+
+    <div style="flex: 1; min-width: 150px;">
+      <label for="dari" style="display: block; font-size: 0.85rem; margin-bottom: 4px;">Dari Tanggal</label>
+      <input type="date" id="dari" name="dari" value="{{.Data.DariStr}}" required style="width: 100%; padding: 8px; border-radius: var(--radius); border: 1px solid var(--gray-200);">
+    </div>
+
+    <div style="flex: 1; min-width: 150px;">
+      <label for="sampai" style="display: block; font-size: 0.85rem; margin-bottom: 4px;">Sampai Tanggal</label>
+      <input type="date" id="sampai" name="sampai" value="{{.Data.SampaiStr}}" required style="width: 100%; padding: 8px; border-radius: var(--radius); border: 1px solid var(--gray-200);">
+    </div>
+
+    <button type="submit" class="btn btn-primary" style="height: 38px;">Tampilkan</button>
+  </form>
+</div>
+
+<div class="card report-card" style="padding: 24px; background: #fff;">
+  <div style="text-align: center; border-bottom: 2px solid var(--gray-900); padding-bottom: 14px; margin-bottom: 20px;">
+    <h2 style="margin: 0 0 4px; color: var(--green-700); font-size: 1.4rem;">♻ BANK SAMPAH BERSERI</h2>
+    <div style="font-weight: 700; font-size: 1.15rem; margin-top: 4px;">LAPORAN REKAPITULASI MUTASI TABUNGAN NASABAH</div>
+    <div class="muted" style="font-size: 0.95rem; margin-top: 4px;">
+      Periode: <strong>{{tgl .Data.Laporan.Dari}}</strong> s/d <strong>{{tgl .Data.Laporan.Sampai}}</strong>
+      {{if .Data.Laporan.NamaNasabah}} | Nasabah: <strong>{{.Data.Laporan.NamaNasabah}}</strong>{{end}}
+    </div>
+  </div>
+
+  <div class="stat-grid" style="margin-bottom: 24px;">
+    <div class="stat">
+      <div class="stat-label">Total Penambahan Saldo (Kredit)</div>
+      <div class="stat-value" style="color: var(--green-600);">+ {{rupiah .Data.Laporan.TotalKredit}}</div>
+      <div class="stat-sub">Akumulasi uang masuk (setoran sampah)</div>
+    </div>
+    <div class="stat stat-warn">
+      <div class="stat-label">Total Pemotongan Saldo (Debit)</div>
+      <div class="stat-value" style="color: var(--red-600);">- {{rupiah .Data.Laporan.TotalDebit}}</div>
+      <div class="stat-sub">Pelunasan tunggakan, penarikan, & iuran</div>
+    </div>
+  </div>
+
+  <div class="table-wrap">
+    <table class="table" style="width: 100%;">
+      <thead>
+        <tr>
+          <th>Tanggal & Waktu</th>
+          <th>Kode</th>
+          <th>Nama Nasabah</th>
+          <th>Jenis Transaksi</th>
+          <th class="num">Debit (-)</th>
+          <th class="num">Kredit (+)</th>
+          <th class="num">Saldo Akhir</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{if .Data.Laporan.Items}}
+          {{range .Data.Laporan.Items}}
+          <tr>
+            <td>{{tgl .Tanggal}}</td>
+            <td>{{.KodeNasabah}}</td>
+            <td><strong>{{.NamaNasabah}}</strong></td>
+            <td>
+              <span class="badge {{if eq .Jenis "setoran"}}badge-ok{{else if eq .Jenis "penarikan"}}badge-warn{{else}}badge-off{{end}}">
+                {{labelJenis .Jenis}}
+              </span>
+            </td>
+            <td class="num" style="color: var(--red-600); font-weight: 600;">
+              {{if not (isKredit .Jenis)}}- {{rupiah .Nominal}}{{else}}-{{end}}
+            </td>
+            <td class="num" style="color: var(--green-600); font-weight: 600;">
+              {{if isKredit .Jenis}}+ {{rupiah .Nominal}}{{else}}-{{end}}
+            </td>
+            <td class="num"><strong>{{rupiah .SaldoSesudah}}</strong></td>
+          </tr>
+          {{end}}
+        {{else}}
+          <tr>
+            <td colspan="7" class="empty">Tidak ada catatan transaksi mutasi pada periode yang dipilih.</td>
+          </tr>
+        {{end}}
+      </tbody>
+      {{if .Data.Laporan.Items}}
+      <tfoot>
+        <tr style="border-top: 2px solid var(--gray-900); font-weight: 700;">
+          <td colspan="4" style="text-align: right; padding-top: 10px;">TOTAL PERIODE INI:</td>
+          <td class="num" style="padding-top: 10px; color: var(--red-600);">- {{rupiah .Data.Laporan.TotalDebit}}</td>
+          <td class="num" style="padding-top: 10px; color: var(--green-600);">+ {{rupiah .Data.Laporan.TotalKredit}}</td>
+          <td></td>
+        </tr>
+      </tfoot>
+      {{end}}
+    </table>
+  </div>
+</div>
+{{end}}
+

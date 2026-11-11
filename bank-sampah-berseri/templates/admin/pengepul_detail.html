@@ -1,0 +1,19 @@
+{{define "content"}}
+<div class="page-header">
+  <h1 class="page-title">Detail Pengepul</h1>
+  <div class="actions">
+    <a href="/admin/pengepul" class="btn btn-outline">Kembali</a>
+    <a href="/admin/pengepul/{{.Data.P.ID}}/edit" class="btn btn-primary">Edit</a>
+  </div>
+</div>
+
+<div class="card">
+  <dl class="detail">
+    <dt>Nama</dt><dd>{{.Data.P.Nama}}</dd>
+    <dt>No. Telepon</dt><dd>{{if .Data.P.NoTelepon}}{{.Data.P.NoTelepon}}{{else}}-{{end}}</dd>
+    <dt>Alamat</dt><dd>{{if .Data.P.Alamat}}{{.Data.P.Alamat}}{{else}}-{{end}}</dd>
+    <dt>Jumlah Penjualan</dt><dd>{{.Data.R.JumlahPenjualan}} transaksi</dd>
+    <dt>Total Pendapatan</dt><dd>{{rupiah .Data.R.TotalPendapatan}}</dd>
+  </dl>
+</div>
+{{end}}

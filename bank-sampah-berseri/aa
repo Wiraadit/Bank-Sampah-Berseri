@@ -1,0 +1,17 @@
+bank-sampah-berseri/
+├── main.go
+├── go.mod / go.sum
+├── config.json              ← kredensial DB (jangan di-commit)
+├── config.example.json
+├── config/
+│   └── database.go
+├── controllers/   (auth, dashboard, nasabah, sampah, pengepul, setoran,
+│                   pemilahan, penjualan, saldo, iuran, laporan)
+├── models/        (user, nasabah, jenis_sampah, setoran, pemilahan,
+│                   pengepul, penjualan, iuran, transaksi_saldo)
+├── services/      (setoran, stok, penjualan, saldo, iuran)
+├── middleware/auth.go
+├── routes/routes.go
+├── templates/     (layouts/, auth/, admin/, nasabah/)
+├── static/        (css/, js/, images/)
+└── database/      (schema.sql, seed.sql)

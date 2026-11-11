@@ -1,0 +1,53 @@
+{{define "content"}}
+<h1 class="page-title">Dashboard Admin</h1>
+<p class="muted">Selamat datang, <strong>{{.User.Nama}}</strong>. Ringkasan transaksi untuk bulan {{.Data.Bulan}}.</p>
+
+<div class="stat-grid">
+  <div class="stat">
+    <div class="stat-label">Total Nasabah</div>
+    <div class="stat-value">{{.Data.Stats.TotalNasabah}}</div>
+    <div class="stat-sub">{{.Data.Stats.NasabahAktif}} aktif</div>
+  </div>
+  <div class="stat">
+    <div class="stat-label">Total Saldo Nasabah</div>
+    <div class="stat-value">{{rupiah .Data.Stats.TotalSaldo}}</div>
+  </div>
+  <div class="stat">
+    <div class="stat-label">Total Stok Sampah</div>
+    <div class="stat-value">{{kg .Data.Stats.TotalStok}}</div>
+    <div class="stat-sub">di gudang saat ini</div>
+  </div>
+  <div class="stat stat-warn">
+    <div class="stat-label">Total Tunggakan</div>
+    <div class="stat-value">{{rupiah .Data.Stats.TotalTunggakan}}</div>
+    <div class="stat-sub">{{.Data.Stats.NasabahMenunggak}} nasabah menunggak</div>
+  </div>
+  <div class="stat">
+    <div class="stat-label">Setoran Bulan Ini</div>
+    <div class="stat-value">{{rupiah .Data.Stats.SetoranBulanNilai}}</div>
+    <div class="stat-sub">{{.Data.Stats.SetoranBulanJumlah}} transaksi</div>
+  </div>
+  <div class="stat">
+    <div class="stat-label">Penjualan Bulan Ini</div>
+    <div class="stat-value">{{rupiah .Data.Stats.PenjualanBulanNilai}}</div>
+    <div class="stat-sub">{{.Data.Stats.PenjualanBulanJumlah}} transaksi</div>
+  </div>
+</div>
+
+<div class="card">
+  <h2 class="card-title">Aktivitas Setoran 7 Hari Terakhir</h2>
+  {{if not .Data.AdaSetoran}}
+  <p class="muted">Belum ada setoran dalam 7 hari terakhir.</p>
+  {{end}}
+  <div class="chart-box">
+    <canvas id="chart-setoran" data-labels="{{.Data.ChartLabels}}" data-values="{{.Data.ChartValues}}"></canvas>
+  </div>
+  <p id="chart-fallback" class="muted" hidden>Grafik tidak dapat dimuat (file static/js/chart.umd.js tidak ditemukan).
+  </p>
+</div>
+{{end}}
+
+{{define "scripts"}}
+<script src="/static/js/chart.umd.js"></script>
+<script src="/static/js/dashboard.js"></script>
+{{end}}

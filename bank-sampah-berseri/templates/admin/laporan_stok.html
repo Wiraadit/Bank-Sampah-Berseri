@@ -1,0 +1,77 @@
+{{define "content"}}
+<div class="page-header no-print">
+  <h1 class="page-title">Laporan Posisi Stok Gudang</h1>
+  <div class="actions">
+    <button type="button" onclick="window.print()" class="btn btn-primary">🖨 Cetak Laporan</button>
+    <a href="/admin/laporan" class="btn btn-outline">Kembali ke Laporan</a>
+  </div>
+</div>
+
+<div class="card report-card" style="padding: 24px; background: #fff;">
+  <div style="text-align: center; border-bottom: 2px solid var(--gray-900); padding-bottom: 14px; margin-bottom: 20px;">
+    <h2 style="margin: 0 0 4px; color: var(--green-700); font-size: 1.4rem;">♻ BANK SAMPAH BERSERI</h2>
+    <div style="font-weight: 700; font-size: 1.15rem; margin-top: 4px;">LAPORAN INVENTARIS & POSISI STOK GUDANG</div>
+    <div class="muted" style="font-size: 0.95rem; margin-top: 4px;">
+      Posisi Stok Riil Terkini
+    </div>
+  </div>
+
+  <div class="stat-grid" style="margin-bottom: 24px;">
+    <div class="stat">
+      <div class="stat-label">Total Bobot Sampah di Gudang</div>
+      <div class="stat-value" style="color: var(--green-700);">{{kg .Data.TotalBobot}}</div>
+      <div class="stat-sub">Akumulasi seluruh jenis sampah</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">Total Nilai Aset Gudang (Harga Beli)</div>
+      <div class="stat-value">{{rupiah .Data.TotalNilaiAset}}</div>
+      <div class="stat-sub">Modal pembelian yang tersimpan di gudang</div>
+    </div>
+  </div>
+
+  <div class="table-wrap">
+    <table class="table" style="width: 100%;">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Nama Jenis Sampah</th>
+          <th class="num">Harga Beli / kg</th>
+          <th class="num">Setoran Masuk</th>
+          <th class="num">Hasil Pilah Masuk</th>
+          <th class="num">Bahan Pilah Keluar</th>
+          <th class="num">Penjualan Keluar</th>
+          <th class="num">Sisa Stok Gudang</th>
+          <th class="num">Estimasi Nilai Aset</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{range .Data.Items}}
+        <tr>
+          <td>{{.ID}}</td>
+          <td><strong>{{.NamaJenis}}</strong></td>
+          <td class="num">{{rupiah .HargaBeli}}</td>
+          <td class="num muted">+{{kg .TotalSetoran}}</td>
+          <td class="num muted">+{{kg .TotalHasilPilah}}</td>
+          <td class="num muted">-{{kg .TotalBahanPilah}}</td>
+          <td class="num muted">-{{kg .TotalPenjualan}}</td>
+          <td class="num">
+            <strong style="font-size: 1.05rem; {{if gt .SisaStok 0.0}}color: var(--green-700);{{else}}color: var(--gray-600);{{end}}">
+              {{kg .SisaStok}}
+            </strong>
+          </td>
+          <td class="num"><strong>{{rupiah .NilaiAset}}</strong></td>
+        </tr>
+        {{end}}
+      </tbody>
+      <tfoot>
+        <tr style="border-top: 2px solid var(--gray-900); font-weight: 700;">
+          <td colspan="7" style="text-align: right; padding-top: 10px;">TOTAL ASET GUDANG:</td>
+          <td class="num" style="padding-top: 10px; color: var(--green-700);">{{kg .Data.TotalBobot}}</td>
+          <td class="num" style="padding-top: 10px; color: var(--green-700);">{{rupiah .Data.TotalNilaiAset}}</td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+</div>
+{{end}}
+

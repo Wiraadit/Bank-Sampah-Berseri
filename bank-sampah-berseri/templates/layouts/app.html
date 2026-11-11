@@ -1,0 +1,59 @@
+{{define "layout"}}<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{.Title}} - Bank Sampah Berseri</title>
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar" id="sidebar">
+    <div class="brand">♻ Bank Sampah Berseri</div>
+    <nav class="menu">
+      {{if eq .User.Role "admin"}}
+        <a href="/admin/dashboard" class="{{if eq .Active "dashboard"}}active{{end}}">Dashboard</a>
+        <a href="/admin/nasabah" class="{{if eq .Active "nasabah"}}active{{end}}">Data Nasabah</a>
+        <a href="/admin/sampah" class="{{if eq .Active "sampah"}}active{{end}}">Jenis Sampah</a>
+        <a href="/admin/pengepul" class="{{if eq .Active "pengepul"}}active{{end}}">Pengepul</a>
+        <a href="/admin/setoran" class="{{if eq .Active "setoran"}}active{{end}}">Setoran Sampah</a>
+        <a href="/admin/pemilahan" class="{{if eq .Active "pemilahan"}}active{{end}}">Pemilahan Sampah</a>
+        <a href="/admin/stok" class="{{if eq .Active "stok"}}active{{end}}">Stok Gudang</a>
+        <a href="/admin/penjualan" class="{{if eq .Active "penjualan"}}active{{end}}">Penjualan Sampah</a>
+        <a href="/admin/saldo" class="{{if eq .Active "saldo"}}active{{end}}">Keuangan & Saldo</a>
+        <a href="/admin/iuran" class="{{if eq .Active "iuran"}}active{{end}}">Iuran Bulanan</a>
+        <a href="/admin/laporan" class="{{if eq .Active "laporan"}}active{{end}}">Laporan</a>
+      {{else}}
+        <a href="/nasabah/dashboard" class="{{if eq .Active "dashboard"}}active{{end}}">Dashboard</a>
+        <a href="/nasabah/profil" class="{{if eq .Active "profil"}}active{{end}}">Profil Saya</a>
+        <a href="/nasabah/mutasi" class="{{if eq .Active "mutasi"}}active{{end}}">Buku Tabungan</a>
+        <a href="/nasabah/setoran" class="{{if eq .Active "setoran"}}active{{end}}">Riwayat Setoran</a>
+        <a href="/nasabah/katalog" class="{{if eq .Active "katalog"}}active{{end}}">Katalog Harga</a>
+      {{end}}
+    </nav>
+  </aside>
+
+  <div class="main">
+    <header class="topbar">
+      <button type="button" class="menu-toggle" id="menu-toggle" aria-label="Buka menu">☰</button>
+      <div class="topbar-right">
+        <span class="user-name">{{.User.Nama}}</span>
+        <span class="badge">{{.User.Role}}</span>
+        <form method="post" action="/logout" data-confirm="Yakin ingin keluar?">
+          <input type="hidden" name="csrf_token" value="{{.CSRF}}">
+          <button type="submit" class="btn btn-outline">Logout</button>
+        </form>
+      </div>
+    </header>
+
+    <main class="content">
+      {{if .Error}}<div class="alert alert-error">{{.Error}}</div>{{end}}
+      {{if .Success}}<div class="alert alert-success">{{.Success}}</div>{{end}}
+      {{template "content" .}}
+    </main>
+  </div>
+</div>
+<script src="/static/js/app.js"></script>
+{{block "scripts" .}}{{end}}
+</body>
+</html>{{end}}

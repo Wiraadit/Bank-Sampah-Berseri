@@ -1,0 +1,71 @@
+{{define "content"}}
+<div class="page-header">
+  <h1 class="page-title">Monitoring Stok Gudang</h1>
+  <div class="actions">
+    <a href="/admin/setoran/tambah" class="btn btn-outline">+ Catat Setoran</a>
+    <a href="/admin/pemilahan/tambah" class="btn btn-primary">+ Pemilahan Sampah</a>
+  </div>
+</div>
+
+<div class="stat-grid" style="margin-bottom: 24px;">
+  <div class="stat">
+    <div class="stat-label">Total Berat Sampah di Gudang</div>
+    <div class="stat-value" style="color: var(--green-700);">{{kg .Data.TotalBerat}}</div>
+    <div class="stat-sub">Akumulasi seluruh jenis sampah</div>
+  </div>
+  <div class="stat">
+    <div class="stat-label">Estimasi Nilai Aset Gudang (Harga Beli)</div>
+    <div class="stat-value">{{rupiah .Data.TotalAsetBeli}}</div>
+    <div class="stat-sub">Modal pembelian dari nasabah</div>
+  </div>
+</div>
+
+<div class="card">
+  <h3 class="card-title">Ketersediaan Stok per Jenis Sampah</h3>
+  <div class="table-wrap">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Nama Jenis Sampah</th>
+          <th class="num">Harga Beli / kg</th>
+          <th class="num">Harga Jual / kg</th>
+          <th class="num">Stok Gudang</th>
+          <th>Status</th>
+          <th>Aksi Cepat</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{range .Data.Items}}
+        <tr>
+          <td>{{.ID}}</td>
+          <td><strong>{{.NamaJenis}}</strong></td>
+          <td class="num">{{rupiah .HargaBeli}}</td>
+          <td class="num">{{rupiah .HargaJual}}</td>
+          <td class="num">
+            <span style="font-size: 1.05rem; font-weight: 700; {{if gt .Stok 0.0}}color: var(--green-700);{{else}}color: var(--gray-600);{{end}}">
+              {{kg .Stok}}
+            </span>
+          </td>
+          <td>
+            {{if gt .Stok 0.0}}
+              <span class="badge badge-ok">Tersedia</span>
+            {{else}}
+              <span class="badge badge-off">Kosong</span>
+            {{end}}
+          </td>
+          <td class="actions">
+            {{if and (eq .NamaJenis "Plastik Campur") (gt .Stok 0.0)}}
+              <a href="/admin/pemilahan/tambah" class="btn btn-sm btn-outline">Pilah Sampah</a>
+            {{else}}
+              <span class="muted">-</span>
+            {{end}}
+          </td>
+        </tr>
+        {{end}}
+      </tbody>
+    </table>
+  </div>
+</div>
+{{end}}
+

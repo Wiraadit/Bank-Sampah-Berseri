@@ -1,0 +1,206 @@
+{{define "content"}}
+<div class="page-header">
+  <h1 class="page-title">Catat Pemilahan Sampah Campur</h1>
+  <a href="/admin/pemilahan" class="btn btn-outline">Kembali ke Daftar</a>
+</div>
+
+<form method="post" action="/admin/pemilahan" id="form-pemilahan">
+  <input type="hidden" name="csrf_token" value="{{.CSRF}}">
+
+  <div class="card mb-4" style="margin-bottom: 20px;">
+    <h3 class="card-title">1. Bahan Sampah Campur yang Dipilah</h3>
+    <div class="stat-grid" style="margin-bottom: 16px;">
+      <div class="stat">
+        <div class="stat-label">Jenis Sampah Sumber</div>
+        <div class="stat-value" style="font-size: 1.2rem;">Plastik Campur</div>
+        <div class="stat-sub">Stok Gudang Tersedia: <strong id="stok-tersedia-val">{{kg .Data.StokPlastikCampur}}</strong></div>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="berat_awal">Berat Awal Plastik Campur yang Dipilah (kg) *</label>
+      <input type="number" id="berat_awal" name="berat_awal" step="0.01" min="0.01"
+             max="{{.Data.StokPlastikCampur}}" placeholder="Contoh: 25.50" required
+             style="max-width: 320px; font-size: 1.1rem; padding: 10px; font-weight: 600;">
+      <small class="muted" style="display: block; margin-top: 4px;">
+        Maksimal berat yang dapat diinput adalah stok tersedia ({{kg .Data.StokPlastikCampur}}).
+      </small>
+    </div>
+  </div>
+
+  <div class="card mb-4" style="margin-bottom: 20px;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+      <div>
+        <h3 class="card-title" style="margin: 0;">2. Rincian Hasil Pemilahan</h3>
+        <small class="muted">Termasuk sampah terpilah (PET, PP, dll.) dan Residu</small>
+      </div>
+      <button type="button" id="btn-tambah-baris" class="btn btn-sm btn-outline">+ Tambah Baris Hasil</button>
+    </div>
+
+    <div class="table-wrap">
+      <table class="table" id="tabel-hasil">
+        <thead>
+          <tr>
+            <th style="min-width: 250px;">Jenis Sampah Hasil Pilah</th>
+            <th class="num" style="width: 200px;">Berat Hasil (kg)</th>
+            <th style="width: 60px; text-align: center;">Aksi</th>
+          </tr>
+        </thead>
+        <tbody id="baris-kontainer">
+          <!-- Diisi via JavaScript -->
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card" style="margin-bottom: 24px;">
+    <h3 class="card-title">3. Ringkasan Validasi Berat</h3>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 15px; margin-top: 10px;">
+      <div class="stat">
+        <div class="stat-label">Berat Awal</div>
+        <div class="stat-value" id="calc-berat-awal">0,00 kg</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">Total Hasil Pemilahan</div>
+        <div class="stat-value" id="calc-total-hasil" style="color: var(--green-600);">0,00 kg</div>
+      </div>
+      <div class="stat" id="stat-selisih">
+        <div class="stat-label">Selisih Susut / Residu Lepas</div>
+        <div class="stat-value" id="calc-selisih">0,00 kg</div>
+      </div>
+    </div>
+
+    <div id="pesan-validasi" style="margin-top: 16px; padding: 12px; border-radius: var(--radius); display: none;"></div>
+
+    <div class="form-actions" style="margin-top: 24px;">
+      <button type="submit" class="btn btn-primary" id="btn-submit" style="padding: 12px 24px; font-size: 1rem;">
+        💾 Simpan Pemilahan & Perbarui Stok
+      </button>
+      <a href="/admin/pemilahan" class="btn btn-outline">Batal</a>
+    </div>
+  </div>
+</form>
+
+<template id="tmpl-baris">
+  <tr class="item-row">
+    <td>
+      <select name="jenis_id[]" class="input-jenis" required style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid var(--gray-200);">
+        <option value="">-- Pilih Jenis Hasil --</option>
+        {{range .Data.JenisList}}
+        <option value="{{.ID}}">{{.NamaJenis}}</option>
+        {{end}}
+      </select>
+    </td>
+    <td>
+      <input type="number" name="berat_hasil[]" class="input-berat" step="0.01" min="0" placeholder="0.00" required style="width: 100%; padding: 8px; text-align: right; border-radius: 4px; border: 1px solid var(--gray-200);">
+    </td>
+    <td style="text-align: center; vertical-align: middle;">
+      <button type="button" class="btn btn-sm btn-outline btn-hapus" title="Hapus baris" style="color: var(--red-600); padding: 4px 8px;">✕</button>
+    </td>
+  </tr>
+</template>
+{{end}}
+
+{{define "scripts"}}
+<script>
+(function() {
+  const inpBeratAwal = document.getElementById('berat_awal');
+  const kontainer = document.getElementById('baris-kontainer');
+  const btnTambah = document.getElementById('btn-tambah-baris');
+  const tmpl = document.getElementById('tmpl-baris');
+  const btnSubmit = document.getElementById('btn-submit');
+
+  const calcBeratAwal = document.getElementById('calc-berat-awal');
+  const calcTotalHasil = document.getElementById('calc-total-hasil');
+  const calcSelisih = document.getElementById('calc-selisih');
+  const pesanValidasi = document.getElementById('pesan-validasi');
+
+  const stokTersedia = parseFloat("{{.Data.StokPlastikCampur}}") || 0;
+
+  function formatKg(num) {
+    return (num || 0).toFixed(2).replace('.', ',') + ' kg';
+  }
+
+  function tambahBaris() {
+    const clone = tmpl.content.cloneNode(true);
+    kontainer.appendChild(clone);
+    hitungUlang();
+  }
+
+  function hitungUlang() {
+    const bAwalStr = (inpBeratAwal.value || '').replace(',', '.');
+    const beratAwal = parseFloat(bAwalStr) || 0;
+
+    let totalHasil = 0;
+    const rows = kontainer.querySelectorAll('.item-row');
+    rows.forEach(tr => {
+      const inp = tr.querySelector('.input-berat');
+      const bStr = (inp.value || '').replace(',', '.');
+      const bVal = parseFloat(bStr) || 0;
+      totalHasil += bVal;
+    });
+
+    const selisih = beratAwal - totalHasil;
+
+    calcBeratAwal.textContent = formatKg(beratAwal);
+    calcTotalHasil.textContent = formatKg(totalHasil);
+    calcSelisih.textContent = formatKg(selisih);
+
+    // Validasi aturan Bab 5.3:
+    // 1. Berat awal tidak boleh > stok
+    // 2. Total hasil tidak boleh > berat awal
+    let errorMsg = "";
+    if (beratAwal > stokTersedia) {
+      errorMsg = `Berat awal (${formatKg(beratAwal)}) melebihi stok Plastik Campur yang tersedia (${formatKg(stokTersedia)}).`;
+    } else if (totalHasil > beratAwal + 0.001) {
+      errorMsg = `Total hasil pemilahan (${formatKg(totalHasil)}) melebihi berat awal (${formatKg(beratAwal)}). Harap periksa kembali penimbangan.`;
+    }
+
+    if (errorMsg) {
+      pesanValidasi.style.display = 'block';
+      pesanValidasi.style.background = 'var(--red-50)';
+      pesanValidasi.style.color = 'var(--red-700)';
+      pesanValidasi.style.border = '1px solid var(--red-600)';
+      pesanValidasi.textContent = '⚠ ' + errorMsg;
+      btnSubmit.disabled = true;
+    } else {
+      if (beratAwal > 0 && totalHasil > 0) {
+        pesanValidasi.style.display = 'block';
+        pesanValidasi.style.background = 'var(--green-50)';
+        pesanValidasi.style.color = 'var(--green-700)';
+        pesanValidasi.style.border = '1px solid var(--green-600)';
+        pesanValidasi.textContent = '✓ Perhitungan valid. Siap disimpan ke sistem stok.';
+        btnSubmit.disabled = false;
+      } else {
+        pesanValidasi.style.display = 'none';
+        btnSubmit.disabled = false;
+      }
+    }
+  }
+
+  kontainer.addEventListener('input', function(e) {
+    if (e.target.classList.contains('input-berat')) hitungUlang();
+  });
+
+  kontainer.addEventListener('click', function(e) {
+    if (e.target.classList.contains('btn-hapus')) {
+      const rows = kontainer.querySelectorAll('.item-row');
+      if (rows.length <= 1) {
+        alert('Minimal harus ada 1 baris hasil pemilahan.');
+        return;
+      }
+      e.target.closest('tr').remove();
+      hitungUlang();
+    }
+  });
+
+  inpBeratAwal.addEventListener('input', hitungUlang);
+  btnTambah.addEventListener('click', tambahBaris);
+
+  // Default buat 2 baris awal
+  tambahBaris();
+  tambahBaris();
+})();
+</script>
+{{end}}
+
