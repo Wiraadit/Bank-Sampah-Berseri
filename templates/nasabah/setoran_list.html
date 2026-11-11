@@ -1,0 +1,41 @@
+{{define "content"}}
+<div class="page-header">
+  <h1 class="page-title">Riwayat Setoran Sampah Saya</h1>
+</div>
+
+<div class="card">
+  {{if .Data}}
+  <div class="table-wrap">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>No. Transaksi</th>
+          <th>Tanggal & Waktu</th>
+          <th class="num">Nilai Setoran</th>
+          <th>Petugas Penerima</th>
+          <th>Aksi</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{range .Data}}
+        <tr>
+          <td><strong>#STR-{{printf "%05d" .ID}}</strong></td>
+          <td>{{tgl .Tanggal}}</td>
+          <td class="num"><strong style="color: var(--green-700);">{{rupiah .TotalNilai}}</strong></td>
+          <td><span class="muted">{{.NamaUser}}</span></td>
+          <td class="actions">
+            <a href="/nasabah/setoran/{{.ID}}" class="btn btn-sm btn-outline">Lihat Struk</a>
+          </td>
+        </tr>
+        {{end}}
+      </tbody>
+    </table>
+  </div>
+  {{else}}
+  <div class="empty">
+    Anda belum memiliki riwayat setoran sampah. Silakan bawa sampah anorganik yang telah dipilah ke Bank Sampah Berseri!
+  </div>
+  {{end}}
+</div>
+{{end}}
+

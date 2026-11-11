@@ -1,0 +1,53 @@
+{{define "content"}}
+<div class="page-header">
+  <h1 class="page-title">Setoran Sampah</h1>
+  <a href="/admin/setoran/tambah" class="btn btn-primary">+ Catat Setoran</a>
+</div>
+
+<form method="get" action="/admin/setoran" class="search-bar">
+  <input type="text" name="q" value="{{.Data.Q}}" placeholder="Cari nama atau kode nasabah...">
+  <button type="submit" class="btn btn-outline">Cari</button>
+  {{if .Data.Q}}<a href="/admin/setoran" class="btn btn-outline">Reset</a>{{end}}
+</form>
+
+<div class="card">
+  {{if .Data.Items}}
+  <div class="table-wrap">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>No. Transaksi</th>
+          <th>Tanggal & Waktu</th>
+          <th>Kode</th>
+          <th>Nama Nasabah</th>
+          <th class="num">Total Nilai</th>
+          <th>Petugas</th>
+          <th>Aksi</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{range .Data.Items}}
+        <tr>
+          <td><strong>#STR-{{printf "%05d" .ID}}</strong></td>
+          <td>{{tgl .Tanggal}}</td>
+          <td>{{.KodeNasabah}}</td>
+          <td>{{.NamaNasabah}}</td>
+          <td class="num"><strong>{{rupiah .TotalNilai}}</strong></td>
+          <td><span class="muted">{{.NamaUser}}</span></td>
+          <td class="actions">
+            <a href="/admin/setoran/{{.ID}}" class="btn btn-sm btn-outline">Lihat Bukti</a>
+          </td>
+        </tr>
+        {{end}}
+      </tbody>
+    </table>
+  </div>
+  {{else}}
+  <div class="empty">
+    {{if .Data.Q}}Tidak ada setoran yang cocok dengan pencarian "{{.Data.Q}}".
+    {{else}}Belum ada riwayat setoran. Klik "Catat Setoran" untuk memulai transaksi.{{end}}
+  </div>
+  {{end}}
+</div>
+{{end}}
+

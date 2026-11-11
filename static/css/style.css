@@ -1,0 +1,636 @@
+:root {
+  --green-700: #1b5e20;
+  --green-600: #2e7d32;
+  --green-500: #43a047;
+  --green-50: #f1f8e9;
+  --gray-900: #1f2933;
+  --gray-600: #5f6b76;
+  --gray-200: #e4e7eb;
+  --gray-100: #f5f7fa;
+  --red-600: #c62828;
+  --red-700: #b71c1c;
+  --red-50: #fdecea;
+  --radius: 8px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: "Segoe UI", Roboto, Arial, sans-serif;
+  color: var(--gray-900);
+  background: var(--gray-100);
+  line-height: 1.5;
+}
+
+h1 {
+  margin: 0 0 12px;
+  font-size: 1.5rem;
+}
+
+hr {
+  border: 0;
+  border-top: 1px solid var(--gray-200);
+  margin: 20px 0;
+}
+
+.muted {
+  color: var(--gray-600);
+}
+
+/* Layout aplikasi */
+.app {
+  display: flex;
+  min-height: 100vh;
+}
+
+.sidebar {
+  width: 240px;
+  background: var(--green-700);
+  color: #fff;
+  flex-shrink: 0;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+}
+
+.brand {
+  padding: 20px;
+  font-weight: 700;
+  font-size: 1.1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, .15);
+}
+
+.menu {
+  padding: 12px 0;
+}
+
+.menu a {
+  display: block;
+  padding: 10px 20px;
+  color: #e8f5e9;
+  text-decoration: none;
+  border-left: 4px solid transparent;
+}
+
+.menu a:hover {
+  background: rgba(255, 255, 255, .08);
+}
+
+.menu a.active {
+  background: rgba(255, 255, 255, .15);
+  border-left-color: #a5d6a7;
+  font-weight: 600;
+}
+
+.main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.topbar {
+  background: #fff;
+  border-bottom: 1px solid var(--gray-200);
+  padding: 12px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-left: auto;
+}
+
+.topbar-right form {
+  margin: 0;
+}
+
+.user-name {
+  font-weight: 600;
+}
+
+.menu-toggle {
+  display: none;
+  background: none;
+  border: 0;
+  font-size: 1.5rem;
+  cursor: pointer;
+}
+
+.content {
+  padding: 24px;
+}
+
+.page-title {
+  margin-bottom: 16px;
+}
+
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 4px;
+}
+
+.page-header .page-title {
+  margin-bottom: 12px;
+}
+
+/* Komponen */
+.card {
+  background: #fff;
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius);
+  padding: 20px;
+}
+
+.btn {
+  display: inline-block;
+  padding: 8px 16px;
+  border-radius: var(--radius);
+  border: 1px solid transparent;
+  font-size: .95rem;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.btn-sm {
+  padding: 4px 10px;
+  font-size: .85rem;
+}
+
+.btn-primary {
+  background: var(--green-600);
+  color: #fff;
+}
+
+.btn-primary:hover {
+  background: var(--green-700);
+}
+
+.btn-outline {
+  background: #fff;
+  color: var(--green-700);
+  border-color: var(--green-600);
+}
+
+.btn-outline:hover {
+  background: var(--green-50);
+}
+
+.btn-danger {
+  background: var(--red-600);
+  color: #fff;
+}
+
+.btn-danger:hover {
+  background: var(--red-700);
+}
+
+.btn-block {
+  width: 100%;
+  padding: 10px;
+  margin-top: 8px;
+}
+
+.actions {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.badge {
+  background: var(--green-50);
+  color: var(--green-700);
+  padding: 2px 10px;
+  border-radius: 999px;
+  font-size: .8rem;
+  text-transform: capitalize;
+}
+
+.badge-ok {
+  background: #e8f5e9;
+  color: var(--green-700);
+}
+
+.badge-off {
+  background: #eceff1;
+  color: var(--gray-600);
+}
+
+.badge-warn {
+  background: #fff8e1;
+  color: #f57f17;
+}
+
+.badge-danger {
+  background: #ffebee;
+  color: #c62828;
+}
+
+.alert {
+  padding: 10px 14px;
+  border-radius: var(--radius);
+  margin-bottom: 16px;
+}
+
+.alert-error {
+  background: var(--red-50);
+  color: var(--red-600);
+  border: 1px solid #f5c2c0;
+}
+
+.alert-success {
+  background: var(--green-50);
+  color: var(--green-700);
+  border: 1px solid #c5e1a5;
+}
+
+/* Form */
+label {
+  display: block;
+  margin: 12px 0 4px;
+  font-weight: 600;
+  font-size: .9rem;
+}
+
+input[type=text],
+input[type=password],
+input[type=tel],
+textarea {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #cbd2d9;
+  border-radius: var(--radius);
+  font-size: 1rem;
+  font-family: inherit;
+}
+
+input:disabled {
+  background: var(--gray-100);
+  color: var(--gray-600);
+}
+
+input:focus,
+textarea:focus {
+  outline: 2px solid #a5d6a7;
+  border-color: var(--green-500);
+}
+
+.form-card {
+  max-width: 560px;
+}
+
+.form-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 20px;
+}
+
+.search-bar {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+  max-width: 520px;
+}
+
+.search-bar input {
+  flex: 1;
+}
+
+/* Tabel */
+.table-wrap {
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table th,
+.table td {
+  padding: 10px 12px;
+  text-align: left;
+  border-bottom: 1px solid var(--gray-200);
+  white-space: nowrap;
+}
+
+.table th {
+  background: var(--gray-100);
+  font-size: .85rem;
+  color: var(--gray-600);
+  text-transform: uppercase;
+  letter-spacing: .03em;
+}
+
+.table tbody tr:hover {
+  background: #fafcf8;
+}
+
+.table .num {
+  text-align: right;
+}
+
+.empty {
+  text-align: center;
+  color: var(--gray-600);
+  padding: 32px 12px;
+}
+
+/* Detail */
+.detail {
+  display: grid;
+  grid-template-columns: 160px 1fr;
+  gap: 10px 16px;
+  margin: 0;
+}
+
+.detail dt {
+  color: var(--gray-600);
+}
+
+.detail dd {
+  margin: 0;
+  font-weight: 600;
+}
+
+/* Card khusus struk & laporan */
+.receipt-card {
+  max-width: 680px;
+  margin: 0 auto;
+}
+
+.report-card {
+  max-width: 100%;
+  margin: 0 auto;
+}
+
+/* Halaman login */
+.login-page {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 16px;
+  background: linear-gradient(135deg, var(--green-50), #fff);
+}
+
+.login-card {
+  width: 100%;
+  max-width: 380px;
+  background: #fff;
+  padding: 32px 28px;
+  border-radius: 12px;
+  border: 1px solid var(--gray-200);
+  box-shadow: 0 6px 24px rgba(0, 0, 0, .06);
+}
+
+.login-card h1 {
+  text-align: center;
+  margin-bottom: 4px;
+}
+
+.login-card .muted {
+  text-align: center;
+  margin: 0 0 16px;
+}
+
+.login-brand {
+  text-align: center;
+  font-size: 2.5rem;
+  color: var(--green-600);
+}
+
+/* Responsif */
+@media (max-width: 768px) {
+  .sidebar {
+    position: fixed;
+    z-index: 20;
+    left: -260px;
+    transition: left .2s;
+  }
+
+  .sidebar.open {
+    left: 0;
+  }
+
+  .menu-toggle {
+    display: block;
+  }
+
+  .content {
+    padding: 16px;
+  }
+
+  .topbar {
+    padding: 10px 16px;
+  }
+
+  .user-name {
+    display: none;
+  }
+
+  .detail {
+    grid-template-columns: 1fr;
+    gap: 2px;
+  }
+
+  .detail dd {
+    margin-bottom: 10px;
+  }
+}
+
+/* ===== Tahap 3C: dashboard ===== */
+[hidden] {
+  display: none !important;
+}
+
+.card-title {
+  font-size: 1.05rem;
+  margin: 0 0 12px;
+}
+
+.stat-grid {
+  display: grid;
+  gap: 16px;
+  margin-bottom: 20px;
+  margin-top: 16px;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+}
+
+.stat {
+  background: #fff;
+  border: 1px solid var(--gray-200);
+  border-left: 4px solid var(--green-500);
+  border-radius: var(--radius);
+  padding: 16px 18px;
+}
+
+.stat-warn {
+  border-left-color: #f9a825;
+}
+
+.stat-label {
+  color: var(--gray-600);
+  font-size: .85rem;
+}
+
+.stat-value {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 2px 0;
+  word-break: break-word;
+}
+
+.stat-sub {
+  color: var(--gray-600);
+  font-size: .85rem;
+}
+
+.chart-box {
+  position: relative;
+  height: 300px;
+}
+
+/* ===== Print Styles ===== */
+@media print {
+  @page {
+    size: auto;
+    margin: 10mm 12mm;
+  }
+
+  *,
+  *::before,
+  *::after {
+    text-shadow: none !important;
+    box-shadow: none !important;
+  }
+
+  body {
+    background: #fff !important;
+    color: #000 !important;
+    font-size: 11pt;
+  }
+
+  .sidebar,
+  .topbar,
+  .no-print,
+  .menu-toggle,
+  .alert,
+  .search-bar,
+  button,
+  .actions {
+    display: none !important;
+  }
+
+  .app,
+  .main,
+  .content {
+    display: block !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    min-height: auto !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow: visible !important;
+  }
+
+  .card,
+  .receipt-card,
+  .report-card {
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    background: transparent !important;
+    max-width: 100% !important;
+    width: 100% !important;
+    margin: 0 !important;
+    overflow: visible !important;
+  }
+
+  /* Hilangkan scroll bar dan pastikan tabel tampil penuh */
+  .table-wrap {
+    overflow: visible !important;
+    overflow-x: visible !important;
+    overflow-y: visible !important;
+    display: block !important;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  .table {
+    width: 100% !important;
+    border-collapse: collapse !important;
+    table-layout: auto !important;
+  }
+
+  .table th,
+  .table td {
+    border: 1px solid #ccc !important;
+    padding: 6px 8px !important;
+    font-size: 8.5pt !important;
+    white-space: normal !important; /* Izinkan teks melipat ke baris baru agar tidak memaksa scrollbar */
+    word-break: normal !important;
+    overflow-wrap: break-word !important;
+  }
+
+  .table th {
+    background: #f0f0f0 !important;
+    color: #000 !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .table tbody tr:hover {
+    background: transparent !important;
+  }
+
+  /* Cegah baris tabel terpotong di perbatasan halaman cetak */
+  table {
+    page-break-inside: auto;
+  }
+
+  tr {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+
+  thead {
+    display: table-header-group !important;
+  }
+
+  tfoot {
+    display: table-footer-group !important;
+  }
+
+  /* Stat grid saat cetak */
+  .stat-grid {
+    grid-template-columns: repeat(4, 1fr) !important;
+    gap: 8px !important;
+    margin-bottom: 16px !important;
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+
+  .stat {
+    border: 1px solid #ccc !important;
+    padding: 8px 10px !important;
+    background: #fafafa !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .stat-value {
+    font-size: 1.15rem !important;
+  }
+}

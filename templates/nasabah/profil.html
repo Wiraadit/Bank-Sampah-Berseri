@@ -1,0 +1,46 @@
+{{define "content"}}
+<div class="page-header">
+  <h1 class="page-title">Profil Saya</h1>
+</div>
+
+<div class="stat-grid" style="margin-bottom: 24px;">
+  <div class="stat">
+    <div class="stat-label">Saldo Tabungan Anda</div>
+    <div class="stat-value" style="color: var(--green-700);">{{rupiah .Data.Saldo}}</div>
+    <div class="stat-sub">Sisa saldo tabungan aktif</div>
+  </div>
+  <div class="stat stat-warn">
+    <div class="stat-label">Tunggakan Iuran Bulanan</div>
+    <div class="stat-value" style="color: var(--red-600);">{{rupiah .Data.Tunggakan}}</div>
+    <div class="stat-sub">Akan otomatis terpotong pada setoran berikutnya</div>
+  </div>
+</div>
+
+<div class="card" style="max-width: 680px;">
+  <h3 class="card-title">Informasi Akun & Keanggotaan</h3>
+  <dl class="detail">
+    <dt>Kode Nasabah</dt>
+    <dd><strong style="font-size: 1.1rem; color: var(--green-700);">{{.Data.KodeNasabah}}</strong></dd>
+
+    <dt>Nama Lengkap</dt>
+    <dd>{{.Data.Nama}}</dd>
+
+    <dt>Username Login</dt>
+    <dd>{{.Data.Username}}</dd>
+
+    <dt>Nomor Telepon</dt>
+    <dd>{{if .Data.NoTelepon}}{{.Data.NoTelepon}}{{else}}<span class="muted">-</span>{{end}}</dd>
+
+    <dt>Alamat Domisili</dt>
+    <dd>{{if .Data.Alamat}}{{.Data.Alamat}}{{else}}<span class="muted">-</span>{{end}}</dd>
+
+    <dt>Status Keanggotaan</dt>
+    <dd>
+      <span class="badge {{if eq .Data.Status "aktif"}}badge-ok{{else}}badge-off{{end}}">
+        {{.Data.Status}}
+      </span>
+    </dd>
+  </dl>
+</div>
+{{end}}
+

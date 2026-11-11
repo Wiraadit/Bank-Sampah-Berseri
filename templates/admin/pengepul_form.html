@@ -1,0 +1,23 @@
+{{define "content"}}
+<h1 class="page-title">{{if .Data.IsEdit}}Edit Pengepul{{else}}Tambah Pengepul{{end}}</h1>
+
+<div class="card form-card">
+  <form method="post" action="{{if .Data.IsEdit}}/admin/pengepul/{{.Data.ID}}{{else}}/admin/pengepul{{end}}">
+    <input type="hidden" name="csrf_token" value="{{.CSRF}}">
+
+    <label for="nama">Nama *</label>
+    <input type="text" id="nama" name="nama" value="{{.Data.Nama}}" maxlength="100" required>
+
+    <label for="no_telepon">No. Telepon</label>
+    <input type="tel" id="no_telepon" name="no_telepon" value="{{.Data.NoTelepon}}" placeholder="08123456789">
+
+    <label for="alamat">Alamat</label>
+    <textarea id="alamat" name="alamat" rows="3" maxlength="500">{{.Data.Alamat}}</textarea>
+
+    <div class="form-actions">
+      <button type="submit" class="btn btn-primary">Simpan</button>
+      <a href="{{if .Data.IsEdit}}/admin/pengepul/{{.Data.ID}}{{else}}/admin/pengepul{{end}}" class="btn btn-outline">Batal</a>
+    </div>
+  </form>
+</div>
+{{end}}

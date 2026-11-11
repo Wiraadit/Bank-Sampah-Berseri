@@ -1,0 +1,37 @@
+{{define "content"}}
+<div class="page-header">
+  <h1 class="page-title">Detail Nasabah</h1>
+  <div class="actions">
+    <a href="/admin/nasabah" class="btn btn-outline">Kembali</a>
+    {{if eq .Data.Status "aktif"}}
+      <a href="/admin/setoran/tambah?nasabah_id={{.Data.ID}}" class="btn btn-outline">+ Catat Setoran</a>
+    {{end}}
+    <a href="/admin/nasabah/{{.Data.ID}}/edit" class="btn btn-primary">Edit</a>
+  </div>
+</div>
+
+<div class="card">
+  <dl class="detail">
+    <dt>Kode Nasabah</dt><dd>{{.Data.KodeNasabah}}</dd>
+    <dt>Nama</dt><dd>{{.Data.Nama}}</dd>
+    <dt>Username</dt><dd>{{.Data.Username}}</dd>
+    <dt>Alamat</dt><dd>{{if .Data.Alamat}}{{.Data.Alamat}}{{else}}-{{end}}</dd>
+    <dt>No. Telepon</dt><dd>{{if .Data.NoTelepon}}{{.Data.NoTelepon}}{{else}}-{{end}}</dd>
+    <dt>Saldo</dt><dd>{{rupiah .Data.Saldo}}</dd>
+    <dt>Tunggakan</dt><dd>{{rupiah .Data.Tunggakan}}</dd>
+    <dt>Status</dt>
+    <dd><span class="badge {{if eq .Data.Status "aktif"}}badge-ok{{else}}badge-off{{end}}">{{.Data.Status}}</span></dd>
+  </dl>
+
+  <hr>
+  <form method="post" action="/admin/nasabah/{{.Data.ID}}/status"
+        data-confirm="{{if eq .Data.Status "aktif"}}Nonaktifkan nasabah ini? Nasabah tidak bisa login lagi.{{else}}Aktifkan kembali nasabah ini?{{end}}">
+    <input type="hidden" name="csrf_token" value="{{.CSRF}}">
+    {{if eq .Data.Status "aktif"}}
+      <button type="submit" class="btn btn-danger">Nonaktifkan Nasabah</button>
+    {{else}}
+      <button type="submit" class="btn btn-primary">Aktifkan Nasabah</button>
+    {{end}}
+  </form>
+</div>
+{{end}}

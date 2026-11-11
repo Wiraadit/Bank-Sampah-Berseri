@@ -1,0 +1,283 @@
+{{define "content"}}
+<div class="page-header">
+  <h1 class="page-title">Catat Penjualan ke Pengepul</h1>
+  <a href="/admin/penjualan" class="btn btn-outline">Kembali ke Daftar</a>
+</div>
+
+<form method="post" action="/admin/penjualan" id="form-penjualan">
+  <input type="hidden" name="csrf_token" value="{{.CSRF}}">
+
+  <div class="card mb-4" style="margin-bottom: 20px;">
+    <h3 class="card-title">1. Pilih Pengepul Tujuan</h3>
+    <div class="form-group">
+      <label for="pengepul_id">Pengepul *</label>
+      <select id="pengepul_id" name="pengepul_id" required style="width: 100%; padding: 10px; border-radius: var(--radius); border: 1px solid var(--gray-200);">
+        <option value="">-- Pilih Pengepul --</option>
+        {{range .Data.PengepulList}}
+        <option value="{{.ID}}" {{if eq .ID $.Data.SelectedPengepulID}}selected{{end}}>
+          {{.Nama}} {{if .NoTelepon}}({{.NoTelepon}}){{end}}
+        </option>
+        {{end}}
+      </select>
+    </div>
+  </div>
+
+  <div class="card mb-4" style="margin-bottom: 20px;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+      <div>
+        <h3 class="card-title" style="margin: 0;">2. Rincian Sampah yang Dijual</h3>
+        <small class="muted">HPP diambil otomatis dari harga beli master (Metode A) dan dapat disesuaikan.</small>
+      </div>
+      <button type="button" id="btn-tambah-baris" class="btn btn-sm btn-outline">+ Tambah Baris</button>
+    </div>
+
+    <div class="table-wrap">
+      <table class="table" id="tabel-penjualan">
+        <thead>
+          <tr>
+            <th style="min-width: 180px;">Jenis Sampah</th>
+            <th class="num" style="width: 110px;">Stok Ada</th>
+            <th class="num" style="width: 120px;">Berat Keluar</th>
+            <th class="num" style="width: 120px;">Berat Riil</th>
+            <th class="num" style="width: 130px;">Harga Jual</th>
+            <th class="num" style="width: 120px;">HPP (Beli)</th>
+            <th class="num" style="width: 140px;">Subtotal</th>
+            <th class="num" style="width: 130px;">Laba/Rugi</th>
+            <th style="width: 50px; text-align: center;">Aksi</th>
+          </tr>
+        </thead>
+        <tbody id="baris-kontainer">
+          <!-- Diisi via JavaScript -->
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card" style="margin-bottom: 24px;">
+    <h3 class="card-title">3. Ringkasan Hasil Penjualan</h3>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; margin-top: 10px;">
+      <div class="stat">
+        <div class="stat-label">Total Stok Keluar</div>
+        <div class="stat-value" id="calc-stok-keluar">0,00 kg</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">Total Berat Riil (Timbangan)</div>
+        <div class="stat-value" id="calc-berat-riil">0,00 kg</div>
+      </div>
+      <div class="stat stat-warn">
+        <div class="stat-label">Total Penyusutan</div>
+        <div class="stat-value" id="calc-penyusutan" style="color: var(--red-600);">0,00 kg</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">Total Pendapatan</div>
+        <div class="stat-value" id="calc-pendapatan" style="color: var(--green-700);">Rp 0</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">Total Laba / Rugi Bersih</div>
+        <div class="stat-value" id="calc-laba-rugi">Rp 0</div>
+      </div>
+    </div>
+
+    <div id="pesan-error-stok" style="margin-top: 16px; padding: 12px; border-radius: var(--radius); display: none; background: var(--red-50); color: var(--red-700); border: 1px solid var(--red-600);"></div>
+
+    <div class="form-actions" style="margin-top: 24px;">
+      <button type="submit" class="btn btn-primary" id="btn-submit" style="padding: 12px 24px; font-size: 1rem;">
+        💾 Simpan Penjualan & Kurangi Stok
+      </button>
+      <a href="/admin/penjualan" class="btn btn-outline">Batal</a>
+    </div>
+  </div>
+</form>
+
+<template id="tmpl-baris">
+  <tr class="item-row">
+    <td>
+      <select name="jenis_id[]" class="input-jenis" required style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid var(--gray-200);">
+        <option value="">-- Pilih Jenis --</option>
+        {{range .Data.StokList}}
+        <option value="{{.ID}}"
+                data-stok="{{.Stok}}"
+                data-beli="{{.HargaBeli}}"
+                data-jual="{{.HargaJual}}">
+          {{.NamaJenis}}
+        </option>
+        {{end}}
+      </select>
+    </td>
+    <td class="num text-stok" style="vertical-align: middle; color: var(--gray-600); font-weight: 600;">-</td>
+    <td>
+      <input type="number" name="berat_stok[]" class="input-berat-stok" step="0.01" min="0.01" placeholder="0.00" required style="width: 100%; padding: 8px; text-align: right; border-radius: 4px; border: 1px solid var(--gray-200);">
+    </td>
+    <td>
+      <input type="number" name="berat_riil[]" class="input-berat-riil" step="0.01" min="0.01" placeholder="0.00" required style="width: 100%; padding: 8px; text-align: right; border-radius: 4px; border: 1px solid var(--gray-200);">
+    </td>
+    <td>
+      <input type="number" name="harga_jual[]" class="input-harga-jual" step="100" min="0" placeholder="0" required style="width: 100%; padding: 8px; text-align: right; border-radius: 4px; border: 1px solid var(--gray-200);">
+    </td>
+    <td>
+      <input type="number" name="hpp[]" class="input-hpp" step="100" min="0" placeholder="0" required style="width: 100%; padding: 8px; text-align: right; border-radius: 4px; border: 1px solid var(--gray-200);">
+    </td>
+    <td class="num text-subtotal" style="vertical-align: middle; font-weight: 700; color: var(--green-700);">Rp 0</td>
+    <td class="num text-laba" style="vertical-align: middle; font-weight: 600;">Rp 0</td>
+    <td style="text-align: center; vertical-align: middle;">
+      <button type="button" class="btn btn-sm btn-outline btn-hapus" title="Hapus baris" style="color: var(--red-600); padding: 4px 8px;">✕</button>
+    </td>
+  </tr>
+</template>
+{{end}}
+
+{{define "scripts"}}
+<script>
+(function() {
+  const kontainer = document.getElementById('baris-kontainer');
+  const btnTambah = document.getElementById('btn-tambah-baris');
+  const tmpl = document.getElementById('tmpl-baris');
+  const btnSubmit = document.getElementById('btn-submit');
+  const pesanError = document.getElementById('pesan-error-stok');
+
+  const calcStokKeluar = document.getElementById('calc-stok-keluar');
+  const calcBeratRiil = document.getElementById('calc-berat-riil');
+  const calcPenyusutan = document.getElementById('calc-penyusutan');
+  const calcPendapatan = document.getElementById('calc-pendapatan');
+  const calcLabaRugi = document.getElementById('calc-laba-rugi');
+
+  function formatKg(num) {
+    return (num || 0).toFixed(2).replace('.', ',') + ' kg';
+  }
+
+  function formatRupiah(num) {
+    const val = Math.round(num);
+    const neg = val < 0;
+    const abs = Math.abs(val);
+    const str = abs.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+    return (neg ? "-Rp " : "Rp ") + str;
+  }
+
+  function tambahBaris() {
+    const clone = tmpl.content.cloneNode(true);
+    kontainer.appendChild(clone);
+    hitungUlang();
+  }
+
+  function hitungUlang() {
+    let totStokKeluar = 0;
+    let totBeratRiil = 0;
+    let totPendapatan = 0;
+    let totLabaRugi = 0;
+    let errorStok = "";
+
+    const rows = kontainer.querySelectorAll('.item-row');
+    rows.forEach(tr => {
+      const sel = tr.querySelector('.input-jenis');
+      const txtStok = tr.querySelector('.text-stok');
+      const inBStok = tr.querySelector('.input-berat-stok');
+      const inBRiil = tr.querySelector('.input-berat-riil');
+      const inHJual = tr.querySelector('.input-harga-jual');
+      const inHPP = tr.querySelector('.input-hpp');
+      const txtSubtotal = tr.querySelector('.text-subtotal');
+      const txtLaba = tr.querySelector('.text-laba');
+
+      const opt = sel.options[sel.selectedIndex];
+      const stok = opt && opt.value ? parseFloat(opt.dataset.stok || 0) : 0;
+      txtStok.textContent = opt && opt.value ? formatKg(stok) : '-';
+
+      const bStok = parseFloat((inBStok.value || '').replace(',', '.')) || 0;
+      const bRiil = parseFloat((inBRiil.value || '').replace(',', '.')) || 0;
+      const hJual = parseFloat((inHJual.value || '').replace(',', '.')) || 0;
+      const hpp = parseFloat((inHPP.value || '').replace(',', '.')) || 0;
+
+      // Validasi stok
+      if (opt && opt.value && bStok > stok) {
+        errorStok = `Berat stok keluar untuk ${opt.textContent.trim()} (${formatKg(bStok)}) melebihi stok yang tersedia (${formatKg(stok)}).`;
+        inBStok.style.borderColor = 'var(--red-600)';
+      } else {
+        inBStok.style.borderColor = 'var(--gray-200)';
+      }
+
+      // Subtotal = Berat Riil * Harga Jual
+      const subtotal = bRiil * hJual;
+      // Laba/Rugi = (Harga Jual - HPP) * Berat Riil
+      const labaRugi = (hJual - hpp) * bRiil;
+
+      txtSubtotal.textContent = formatRupiah(subtotal);
+      txtLaba.textContent = formatRupiah(labaRugi);
+      if (labaRugi >= 0) {
+        txtLaba.style.color = 'var(--green-600)';
+      } else {
+        txtLaba.style.color = 'var(--red-600)';
+      }
+
+      totStokKeluar += bStok;
+      totBeratRiil += bRiil;
+      totPendapatan += subtotal;
+      totLabaRugi += labaRugi;
+    });
+
+    const totPenyusutan = totStokKeluar - totBeratRiil;
+
+    calcStokKeluar.textContent = formatKg(totStokKeluar);
+    calcBeratRiil.textContent = formatKg(totBeratRiil);
+    calcPenyusutan.textContent = formatKg(totPenyusutan);
+    calcPendapatan.textContent = formatRupiah(totPendapatan);
+    calcLabaRugi.textContent = formatRupiah(totLabaRugi);
+    calcLabaRugi.style.color = totLabaRugi >= 0 ? 'var(--green-600)' : 'var(--red-600)';
+
+    if (errorStok) {
+      pesanError.style.display = 'block';
+      pesanError.textContent = '⚠ ' + errorStok;
+      btnSubmit.disabled = true;
+    } else {
+      pesanError.style.display = 'none';
+      btnSubmit.disabled = false;
+    }
+  }
+
+  // Isi default HPP & Harga Jual saat jenis sampah dipilih
+  kontainer.addEventListener('change', function(e) {
+    if (e.target.classList.contains('input-jenis')) {
+      const tr = e.target.closest('tr');
+      const opt = e.target.options[e.target.selectedIndex];
+      if (opt && opt.value) {
+        const hBeli = opt.dataset.beli || '0';
+        const hJual = opt.dataset.jual || '0';
+        const inHJual = tr.querySelector('.input-harga-jual');
+        const inHPP = tr.querySelector('.input-hpp');
+        if (!inHJual.value || inHJual.value === '0') inHJual.value = Math.round(parseFloat(hJual));
+        if (!inHPP.value || inHPP.value === '0') inHPP.value = Math.round(parseFloat(hBeli));
+      }
+      hitungUlang();
+    }
+  });
+
+  kontainer.addEventListener('input', function(e) {
+    if (e.target.matches('.input-berat-stok, .input-berat-riil, .input-harga-jual, .input-hpp')) {
+      // Jika berat riil masih kosong, otomatis isi sama dengan berat stok sebagai default
+      if (e.target.classList.contains('input-berat-stok')) {
+        const tr = e.target.closest('tr');
+        const inBRiil = tr.querySelector('.input-berat-riil');
+        if (!inBRiil.value) inBRiil.value = e.target.value;
+      }
+      hitungUlang();
+    }
+  });
+
+  kontainer.addEventListener('click', function(e) {
+    if (e.target.classList.contains('btn-hapus')) {
+      const rows = kontainer.querySelectorAll('.item-row');
+      if (rows.length <= 1) {
+        alert('Minimal harus ada 1 baris sampah yang dijual.');
+        return;
+      }
+      e.target.closest('tr').remove();
+      hitungUlang();
+    }
+  });
+
+  btnTambah.addEventListener('click', tambahBaris);
+
+  // Inisialisasi 1 baris awal
+  tambahBaris();
+})();
+</script>
+{{end}}
+

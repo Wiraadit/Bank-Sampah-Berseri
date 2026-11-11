@@ -1,0 +1,44 @@
+{{define "content"}}
+<div class="page-header">
+  <h1 class="page-title">Pemilahan Sampah Campur</h1>
+  <a href="/admin/pemilahan/tambah" class="btn btn-primary">+ Catat Pemilahan</a>
+</div>
+
+<div class="card">
+  {{if .Data.Items}}
+  <div class="table-wrap">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>No. Pemilahan</th>
+          <th>Tanggal & Waktu</th>
+          <th class="num">Berat Awal</th>
+          <th class="num">Total Hasil Pilah</th>
+          <th>Petugas</th>
+          <th>Aksi</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{range .Data.Items}}
+        <tr>
+          <td><strong>#PML-{{printf "%05d" .ID}}</strong></td>
+          <td>{{tgl .Tanggal}}</td>
+          <td class="num"><strong>{{kg .BeratAwal}}</strong></td>
+          <td class="num" style="color: var(--green-600); font-weight: 600;">{{kg .TotalHasil}}</td>
+          <td><span class="muted">{{.NamaUser}}</span></td>
+          <td class="actions">
+            <a href="/admin/pemilahan/{{.ID}}" class="btn btn-sm btn-outline">Lihat Rincian</a>
+          </td>
+        </tr>
+        {{end}}
+      </tbody>
+    </table>
+  </div>
+  {{else}}
+  <div class="empty">
+    Belum ada riwayat pemilahan sampah campur. Klik "Catat Pemilahan" untuk memulai.
+  </div>
+  {{end}}
+</div>
+{{end}}
+
