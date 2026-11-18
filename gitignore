@@ -1,0 +1,18 @@
+# Local database credentials
+config.json
+.env
+.env.*
+!.env.example
+
+# Go build outputs
+/bin/
+/dist/
+*.exe
+*.test
+*.out
+
+# Editor / OS files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
